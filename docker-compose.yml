@@ -1,0 +1,62 @@
+services:
+  # MongoDB Servisi Tanımı
+  mongodb:
+    image: mongo:7 # Resmi MongoDB imajı, Belirli versiyon (mongo:7) da kullanabilirsiniz.
+    container_name: mongodb_container # Konteynere daha okunabilir bir isim verir.
+    ports:
+      # Host makinenizin MONGO_PORT'unu konteynerin varsayılan 27017 portuna eşler.
+      # .env dosyasındaki MONGO_PORT değişkeni kullanılacak.
+      # Bu eşleme, host'tan MongoDB'ye (örneğin bir GUI aracıyla) erişmek için gereklidir, backend için değil.
+      - "${MONGO_PORT}:27017"
+    environment:
+      # MongoDB konteyneri ilk başlatıldığında admin kullanıcısı ve veritabanı oluşturmak için .env'den değişkenler alır.
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB} # Uygulamanızın kullanacağı veritabanı adı
+    volumes:
+      # Veritabanı verilerinin konteyner yeniden başlatılsa/silinse bile kalıcı olmasını sağlar.
+      - mongodb_data:/data/db
+    networks:
+      # Backend servisi ile aynı ağda olmalıdır ki birbirlerini servis adıyla bulabilsinler.
+      - mern-network
+
+  # Backend Servisi Tanımı (Express.js)
+  backend:
+    build: ./backend # docker-compose.yml'nin bulunduğu dizine göre backend Dockerfile'ının yolu.
+    container_name: backend_container # Konteynere isim verir.
+    ports:
+      # Host makinenizin BACKEND_HOST_PORT'una gelen trafiği,
+      # konteynerin içindeki BACKEND_INTERNAL_PORT'una yönlendirir.
+      # Backend uygulamanızın konsolda belirttiği 3030 portu burasıdır.
+      - "${BACKEND_HOST_PORT}:${BACKEND_INTERNAL_PORT}" # Örnek: "5000:3030"
+    environment:
+      # Backend uygulamasının MongoDB'ye bağlanırken kullanacağı bağlantı dizesi.
+      # .env'den gelen değişkenleri kullanarak oluşturulur.
+      # Bağlantı adresi olarak 'mongodb' (MongoDB servis adı) kullanılır.
+      MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}?authSource=admin
+      # Backend uygulamanızın ihtiyaç duyduğu diğer ortam değişkenleri...
+      # Örneğin, uygulamanızın kod içinde hangi portu dinleyeceğini bir ortam değişkeninden okuyorsa:
+      # PORT: ${BACKEND_INTERNAL_PORT} # Eğer backend kodunuz process.env.PORT okuyorsa
+    depends_on:
+      # Backend'in başlamadan önce MongoDB'nin çalışır durumda olmasını sağlar.
+      - mongodb
+    networks:
+      # MongoDB ile aynı ağda olmalıdır.
+      - mern-network
+    # Geliştirme sırasında kod değişikliklerinin anında yansıması için volume ekleyebilirsiniz (İsteğe bağlı).
+    volumes:
+      - ./backend:/app
+      - /app/node_modules # Konteynerdeki node_modules'un üzerine yazılmasını engeller.
+
+# Named Volume Tanımları
+volumes:
+  mongodb_data: # MongoDB verileri için kullanılacak named volume
+
+# Network Tanımları
+networks:
+  mern-network:
+    driver: bridge # Varsayılan bridge ağı, servislerin birbirini isimle bulmasını sağlar.
+
+# Not: docker-compose.yml ile aynı dizindeki .env dosyası otomatik olarak yüklenir.
+# Bu yüzden 'env_file: - .env' satırına burada gerek yoktur.
+# Eğer farklı bir .env dosyası kullanacaksanız, servislerin altına eklemeniz gerekir.

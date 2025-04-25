@@ -1,0 +1,35 @@
+# .github/workflows/ci.yml
+
+name: CI Pipeline # Workflow'un adı
+
+on:
+  push: # Hangi olayda tetikleneceği (her code push edildiğinde)
+    branches:
+      - main # Sadece main dalına push edildiğinde çalışsın (master da olabilir)
+
+  pull_request: # İsteğe bağlı: Bir pull request açıldığında veya güncellendiğinde çalışsın
+    branches:
+      - main # main dalına yapılan pull requestler için
+
+jobs: # Yapılacak işler
+  build-and-test: # İşin adı
+    runs-on: ubuntu-latest # İşin çalışacağı işletim sistemi
+
+    steps: # İşin adımları
+      - name: Proje Kodunu Çek # Adım 1: Git repository'sini çek
+        uses: actions/checkout@v4
+
+      - name: Node.js Kurulumu # Adım 2: Belirtilen Node.js versiyonunu kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Kullanmak istediğiniz Node.js versiyonu (projenize uygun seçin)
+
+      - name: Bağımlılıkları Kur # Adım 3: package.json'daki bağımlılıkları kur (npm install)
+        run: npm install
+
+      - name: Testleri Çalıştır # Adım 4: npm test komutunu çalıştır
+        run: npm test
+
+      # İsteğe bağlı olarak buraya başka adımlar eklenebilir (örn: linting, güvenlik taraması vb.)
+      # - name: Build Project # Uygulamayı derleme adımı (eğer gerekiyorsa)
+      #   run: npm run build
