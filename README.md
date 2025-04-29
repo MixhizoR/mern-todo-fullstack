@@ -30,7 +30,7 @@ Follow these steps to get the application up and running on your local machine u
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/yourusername/mern-todo-fullstack.git](https://github.com/yourusername/mern-todo-fullstack.git)
+    git clone [https://github.com/MixhizoR/mern-todo-fullstack.git](https://github.com/MixhizoR/mern-todo-fullstack.git)
     ```
 2.  **Navigate into the project directory:**
     ```bash
