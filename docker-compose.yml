@@ -1,4 +1,27 @@
 services:
+
+  # Frontend Servisi Tanımı (React.js)
+  frontend:
+    build: ./frontend/react-todo-app # docker-compose.yml'nin bulunduğu dizine göre frontend Dockerfile'ının yolu.
+    container_name: frontend_container # Konteynere isim verir.
+    ports:
+      # Host makinenizin FRONTEND_HOST_PORT'una gelen trafiği,
+      # konteynerin içindeki FRONTEND_INTERNAL_PORT'una yönlendirir.
+      # Frontend uygulamanızın konsolda belirttiği 5173 portu burasıdır.
+      - "${FRONTEND_HOST_PORT}:${FRONTEND_INTERNAL_PORT}" # Örnek: "5173:5173"
+    environment:
+      # Frontend uygulamasının backend'ye bağlanırken kullanacağı bağlantı dizesi.
+      # .env'den gelen değişkenleri kullanarak oluşturulur.
+      # Bağlantı adresi olarak 'backend' (Backend servis adı) kullanılır.
+      REACT_APP_API_URL: http://${BACKEND_HOST}:${BACKEND_INTERNAL_PORT}
+    networks:
+      # Backend servisi ile aynı ağda olmalıdır ki birbirlerini servis adıyla bulabilsinler.
+      - mern-network
+    # Geliştirme sırasında kod değişikliklerinin anında yansıması için volume ekleyebilirsiniz (İsteğe bağlı).
+    volumes:
+      - ./frontend/react-todo-app:/app
+      - /app/node_modules # Konteynerdeki node_modules'un üzerine yazılmasını engeller.
+
   # MongoDB Servisi Tanımı
   mongodb:
     image: mongo:7 # Resmi MongoDB imajı, Belirli versiyon (mongo:7) da kullanabilirsiniz.
