@@ -29,23 +29,28 @@ const TodoAddForm = ({ onAddTodo }: TodoAddFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      className="todo-add-form d-flex gap-2 form-group"
+      onSubmit={handleSubmit}
+    >
       <input
         type="text"
-        placeholder="Yeni todo girin..."
+        placeholder="Add todo..."
         value={todoText}
         onChange={handleTextChange}
+        className="form-control"
       />
-      <label style={{ marginLeft: "10px" }}>
-        Tamamlandı mı?
+      <label>
+        
         <input
           type="checkbox"
           checked={isCompleted}
           onChange={handleCompletedChange}
+          className="form-check-input"
         />
       </label>
-      <button type="submit" style={{ marginLeft: "10px" }}>
-        Todo Ekle
+      <button type="submit" className="btn btn-primary">
+        Add
       </button>
     </form>
   );

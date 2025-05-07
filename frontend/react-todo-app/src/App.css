@@ -1,3 +1,34 @@
-.list-group-item:hover {
-  cursor: pointer;
+.todo-container {
+    width: clamp(300px, 50vw, 600px);
+    height: clamp(300px, 50vh, 600px);
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fdfd96;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: 'Courier New', Courier, monospace;
+    align-items: center;
+    justify-content: center;
 }
+
+.todo-item-container {
+    height: 600px;
+    display: grid;
+    grid-template-columns: 5fr 1fr 1fr;
+    justify-content: space-around;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.todo-item-header, .todo-item-checkbox, .todo-item-delete-button {
+    justify-content: center;
+    align-items: center;
+}
+
+.todo-add-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+    

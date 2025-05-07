@@ -53,7 +53,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ isCompleted: !isCompleted }),
+        body: JSON.stringify({ isCompleted }),
       })
         .then(async (response) => {
           const updatedTodo = await response.json();
@@ -87,13 +87,15 @@ function App() {
   };
 
   return (
-    <div>
-      <h1>Todo App</h1>
+    <div className="container todo-container">
+      <h1 className="text-center">Todo App</h1>
+      <hr />
       <TodoList
         todos={todos}
         onCompleteItem={handleComplete}
         onDeleteItem={handleDelete}
       />
+      <hr />
       <TodoAddForm onAddTodo={handleAddItem} />
     </div>
   );
