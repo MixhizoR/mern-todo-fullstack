@@ -1,35 +1,52 @@
-import { useRef } from "react";
+import React, { useState, FormEvent } from "react";
 
-const TodoAddForm = () => {
-  const titleRef = useRef<HTMLInputElement>(null);
-  const isCompletedRef = useRef<HTMLInputElement>(null);
+interface TodoAddFormProps {
+  onAddTodo: (text: string, isCompleted: boolean) => void;
+}
 
-  const handleAddTodo = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetch("http://localhost:3000/api/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: titleRef.current?.value,
-        isCompleted: isCompletedRef.current?.checked,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error("Error adding todo:", error);
-      });
+const TodoAddForm = ({ onAddTodo }: TodoAddFormProps) => {
+  const [todoText, setTodoText] = useState<string>("");
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTodoText(event.target.value);
+  };
+
+  const handleCompletedChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsCompleted(event.target.checked);
+  };
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (todoText.trim()) {
+      onAddTodo(todoText.trim(), isCompleted);
+      setTodoText("");
+      setIsCompleted(false);
+    }
   };
 
   return (
-    <form onSubmit={handleAddTodo}>
-      <input type="text" ref={titleRef} />
-      <input type="checkbox" ref={isCompletedRef} defaultChecked={false} />
-      <button type="submit">Add Todo</button>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Yeni todo girin..."
+        value={todoText}
+        onChange={handleTextChange}
+      />
+      <label style={{ marginLeft: "10px" }}>
+        Tamamlandı mı?
+        <input
+          type="checkbox"
+          checked={isCompleted}
+          onChange={handleCompletedChange}
+        />
+      </label>
+      <button type="submit" style={{ marginLeft: "10px" }}>
+        Todo Ekle
+      </button>
     </form>
   );
 };

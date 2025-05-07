@@ -1,30 +1,27 @@
+import { useState } from "react";
 import { Todo } from "../types";
 
-const TodoItem = ({ _id, title, isCompleted }: Todo) => {
-  const handleComplete = () => {
-    fetch(`http://localhost:3000/api/posts/${_id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, isCompleted: !isCompleted }),
-    }).then(() => window.location.reload());
-  };
+interface Props {
+  todo: Todo;
+  onCompleteItem: (_id: string, isCompleted: boolean) => void;
+  onDeleteItem: (_id: string) => void;
+}
 
-  const handleDelete = () => {
-    fetch(`http://localhost:3000/api/posts/${_id}`, {
-      method: "DELETE",
-    }).then(() => window.location.reload());
-  };
-
+const TodoItem = ({ todo, onCompleteItem, onDeleteItem }: Props) => {
+  const [isCompleted, setIsCompleted] = useState(todo.isCompleted);
   return (
     <>
-      <h2>{title}</h2>
+      <h2>{todo.title}</h2>
       <p>{isCompleted ? "Completed" : "Not Completed"}</p>
-      <button className="btn btn-primary" onClick={handleComplete}>
-        Complete
-      </button>
-      <button className="btn btn-danger" onClick={handleDelete}>
+      <input
+        type="checkbox"
+        checked={isCompleted}
+        onChange={(e) => {
+          setIsCompleted(e.target.checked);
+          onCompleteItem(todo._id, e.target.checked);
+        }}
+      />
+      <button className="btn btn-danger" onClick={() => onDeleteItem(todo._id)}>
         Delete
       </button>
     </>
